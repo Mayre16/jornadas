@@ -204,6 +204,8 @@ a.card:hover { border-color: var(--gold); }
   margin: 0 0 0.25rem;
 }
 .product .price { margin: 0; font-weight: 650; color: var(--sea); }
+.product .price-note { font-weight: 500; color: var(--muted); }
+.product-desc { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.92rem; }
 
 .prose { max-width: 42rem; }
 .prose p { margin: 0 0 1rem; }

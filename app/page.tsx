@@ -58,7 +58,7 @@ export default function HomePage() {
             </Link>
             <Link className="card" href="/tienda/">
               <h3>Tienda</h3>
-              <p>Separadores de la Librería Logos y recuerdos de Jornadas 2026.</p>
+              <p>Souvenirs dominicanos: café, cacao, ron, mamajuana y recuerdos de la tierra.</p>
             </Link>
             <Link className="card" href="/visitas/">
               <h3>Visitas y paseos</h3>
