@@ -100,6 +100,7 @@ img { max-width: 100%; }
   padding: 0 1.25rem;
 }
 
+.hero .wrap + .wrap { margin-top: 1.5rem; }
 .hero-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
