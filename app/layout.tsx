@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Source_Serif_4 } from "next/font/google";
+import { ReservaProvider } from "@/components/ReservaCart";
 import { SiteShell } from "@/components/SiteShell";
 import "./globals.css";
 
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${sans.variable} ${serif.variable}`}>
       <body>
-        <SiteShell>{children}</SiteShell>
+        <ReservaProvider>
+          <SiteShell>{children}</SiteShell>
+        </ReservaProvider>
       </body>
     </html>
   );

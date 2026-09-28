@@ -6,12 +6,15 @@ import { useState } from "react";
 
 const LINKS = [
   { href: "/", label: "Inicio" },
+  { href: "/bienvenida/", label: "Bienvenida" },
   { href: "/programa/", label: "Programa" },
-  { href: "/visitas/", label: "Visitas" },
-  { href: "/hotel/", label: "Hotel" },
-  { href: "/participacion/", label: "Participación" },
+  { href: "/visitas/", label: "Tours" },
+  { href: "/donde-comer/", label: "Dónde comer" },
+  { href: "/guia/", label: "Guía SD" },
+  { href: "/sedes/", label: "Sedes" },
+  { href: "/practica/", label: "Info práctica" },
   { href: "/tienda/", label: "Tienda" },
-  { href: "/contacto/", label: "Contacto" },
+  { href: "/contacto/", label: "Contactos" },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -63,7 +66,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <footer className="site-footer">
         <div className="wrap">
           <span>Nueva Acrópolis República Dominicana · OINADOM</span>
-          <a href="mailto:Director.NA.RD@acropolis.org">Director.NA.RD@acropolis.org</a>
         </div>
       </footer>
     </>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ReservaButton, ReservaToggle } from "@/components/ReservaCart";
 
 export const metadata: Metadata = { title: "Tienda" };
 
@@ -85,6 +86,47 @@ const SOUVENIRS = [
   },
 ] as const;
 
+const POLOS = [
+  {
+    file: "polo-gm.webp",
+    title: "Polo GM",
+    price: "RD$ 1,220",
+    note: "USD$ 20",
+    description:
+      "Polo naranja en tejido Dry-Fit, con el símbolo de GM bordado en el pecho. Ligero, para las actividades.",
+  },
+  {
+    file: "polo-gf.webp",
+    title: "Polo GF",
+    price: "RD$ 1,220",
+    note: "USD$ 20",
+    description:
+      "Polo azul marino en tejido Dry-Fit, con el símbolo de GF bordado en el pecho.",
+  },
+  {
+    file: "polo-gs.webp",
+    title: "Polo GS",
+    price: "RD$ 1,220",
+    note: "USD$ 20",
+    description: "Polo negro en tejido Dry-Fit, con el símbolo de GS bordado en el pecho.",
+  },
+] as const;
+
+const RESINA = [
+  { file: "vesta.webp", title: "Vesta", price: "RD$ 2,440", note: "USD$ 40" },
+  { file: "leonidas.webp", title: "Busto de Leónidas", price: "RD$ 2,745", note: "USD$ 45" },
+  { file: "escorpion.webp", title: "Escorpión Egipcio", price: "RD$ 1,220", note: "USD$ 20" },
+  { file: "minotauro.webp", title: "Minotauro", price: "RD$ 2,440", note: "USD$ 40" },
+  { file: "ankh-resina.webp", title: "Llave de Ankh", price: "RD$ 1,525", note: "USD$ 25" },
+  { file: "vegvisir.webp", title: "Vegvísir", price: "RD$ 1,830", note: "USD$ 30" },
+  { file: "escarabajo.webp", title: "Escarabajo Egipcio", price: "RD$ 2,440", note: "USD$ 40" },
+  { file: "esfinge.webp", title: "Esfinge", price: "RD$ 3,050", note: "USD$ 50" },
+  { file: "thor.webp", title: "Thor", price: "RD$ 1,098", note: "USD$ 18" },
+  { file: "flor-vida.webp", title: "Flor de la Vida", price: "RD$ 1,220", note: "USD$ 20" },
+  { file: "bastet.webp", title: "Bastet", price: "RD$ 2,745", note: "USD$ 45" },
+  { file: "medusa.webp", title: "Medusa", price: "RD$ 3,050", note: "USD$ 50" },
+] as const;
+
 export default function TiendaPage() {
   return (
     <>
@@ -92,21 +134,16 @@ export default function TiendaPage() {
         <div className="wrap">
           <p className="kicker">Souvenirs</p>
           <h1>Tienda de las Jornadas</h1>
-          <p className="lede">
-            Recuerdos de la República Dominicana para llevarse a casa. Los precios y las fotos son
-            los de la Librería Editorial Logos.
-          </p>
+          <p className="lede">Recuerdos dominicanos, polos y piezas filosóficas en resina.</p>
         </div>
       </section>
       <section className="section">
         <div className="wrap">
+          <h2 className="shop-title">De la tierra</h2>
+          <p className="shop-lead">Café, cacao, ron, mamajuana y recuerdos dominicanos.</p>
           <div className="shop">
             {SOUVENIRS.map((item) => (
-              <a
-                key={item.file}
-                className="product"
-                href="https://tienda.acropolis.org.do/regalos/jornadas-2026/"
-              >
+              <article key={item.file} className="product">
                 <img src={`/img/souvenirs/${item.file}`} alt={item.title} />
                 <div>
                   <h3>{item.title}</h3>
@@ -115,12 +152,80 @@ export default function TiendaPage() {
                     {item.note ? <span className="price-note"> · {item.note}</span> : null}
                   </p>
                   <p className="product-desc">{item.description}</p>
+                  <ReservaButton
+                    product={{
+                      id: item.file,
+                      title: item.title,
+                      priceLabel: item.price,
+                      note: item.note,
+                      description: item.description,
+                      image: `/img/souvenirs/${item.file}`,
+                    }}
+                  />
                 </div>
-              </a>
+              </article>
+            ))}
+          </div>
+          <h2 className="shop-title">Polos</h2>
+          <p className="shop-lead">GM, GF y GS.</p>
+          <div className="shop">
+            {POLOS.map((item) => (
+              <article key={item.file} className="product">
+                <img src={`/img/souvenirs/${item.file}`} alt={item.title} />
+                <div>
+                  <h3>{item.title}</h3>
+                  <p className="price">
+                    {item.price}
+                    <span className="price-note"> · {item.note}</span>
+                  </p>
+                  <p className="product-desc">{item.description}</p>
+                  <ReservaButton
+                    product={{
+                      id: item.file,
+                      title: item.title,
+                      priceLabel: item.price,
+                      note: item.note,
+                      description: item.description,
+                      image: `/img/souvenirs/${item.file}`,
+                    }}
+                  />
+                </div>
+              </article>
+            ))}
+          </div>
+          <h2 className="shop-title">Piezas filosóficas</h2>
+          <p className="shop-lead">Piezas en resina, de Vesta a Medusa.</p>
+          <div className="shop">
+            {RESINA.map((item) => (
+              <article key={item.file} className="product">
+                <img src={`/img/souvenirs/${item.file}`} alt={`${item.title}, pieza en resina`} />
+                <div>
+                  <h3>{item.title}</h3>
+                  <p className="price">
+                    {item.price}
+                    <span className="price-note"> · {item.note}</span>
+                  </p>
+                  <p className="product-desc">Pieza en resina</p>
+                  <ReservaButton
+                    product={{
+                      id: item.file,
+                      title: item.title,
+                      priceLabel: item.price,
+                      note: item.note,
+                      description: "Pieza en resina",
+                      image: `/img/souvenirs/${item.file}`,
+                    }}
+                  />
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
+      <div className="reserve-float">
+        <p>Arme la reserva con los artículos. Se envía al correo de Leslie y una copia al suyo.</p>
+        <ReservaToggle />
+      </div>
     </>
   );
 }
