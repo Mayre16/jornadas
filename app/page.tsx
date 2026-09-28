@@ -4,13 +4,22 @@ export default function HomePage() {
   return (
     <>
       <section className="hero">
-        <div className="wrap">
+        <div className="wrap hero-top">
+          <div>
           <p className="kicker">Centroamérica y el Caribe</p>
           <h1>XXXI Reunión de Coordinación y XXXVI Jornadas del Área</h1>
           <p className="lede">
             Por primera vez en República Dominicana. Santo Domingo recibe a los directores y
             delegaciones del área del 14 al 17 de octubre de 2026, con llegada desde el 12.
           </p>
+          </div>
+          <img
+            className="logo-jornadas"
+            src="/img/logo-jornadas.png"
+            alt="31.ª Jornadas de América Central y el Caribe, República Dominicana 2026"
+          />
+        </div>
+        <div className="wrap">
           <ul className="facts">
             <li>
               <span>Fechas</span>

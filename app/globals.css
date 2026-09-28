@@ -54,8 +54,17 @@ img { max-width: 100%; }
   text-decoration: none;
   color: var(--ink);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.7rem;
   line-height: 1.15;
+}
+.brand img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: #f4f7f4;
 }
 .brand small {
   font-size: 0.72rem;
@@ -91,6 +100,18 @@ img { max-width: 100%; }
   padding: 0 1.25rem;
 }
 
+.hero-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem 2rem;
+  align-items: center;
+}
+.logo-jornadas {
+  width: min(240px, 46vw);
+  height: auto;
+  border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(15, 36, 32, 0.16);
+}
 .hero {
   padding: 3.5rem 0 2.5rem;
   background:
@@ -272,7 +293,8 @@ a.card:hover { border-color: var(--gold); }
 .site-footer a { color: inherit; }
 
 @media (max-width: 800px) {
-  .facts, .grid, .shop { grid-template-columns: 1fr; }
+  .facts, .grid, .shop, .hero-top { grid-template-columns: 1fr; }
+  .logo-jornadas { width: 180px; }
   .day { grid-template-columns: 1fr; }
   .nav-toggle {
     display: inline-flex;

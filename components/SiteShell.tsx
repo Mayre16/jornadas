@@ -26,8 +26,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/" onClick={() => setOpen(false)}>
-            <small>Nueva Acrópolis · República Dominicana</small>
-            <strong>Jornadas 2026</strong>
+            <img src="/img/logo-jornadas.png" alt="" width={52} height={52} />
+            <span>
+              <small>Nueva Acrópolis · República Dominicana</small>
+              <strong>Jornadas 2026</strong>
+            </span>
           </Link>
           <button
             className="nav-toggle"
