@@ -696,12 +696,13 @@ a.card:hover { border-color: var(--gold); }
   .tour-card { width: 100%; max-width: 500px; }
   .place, .place-tall { min-height: 220px; }
   .logo-jornadas { width: 180px; }
-  .nav { background: var(--green); }
   .day, .spot { grid-template-columns: 1fr; }
+  .header-inner { position: relative; }
   .nav-toggle {
     display: inline-flex;
     border: 1px solid var(--line);
-    background: var(--card);
+    background: #fff;
+    color: var(--ink);
     border-radius: 999px;
     padding: 0.4rem 0.8rem;
     font: inherit;
@@ -712,11 +713,24 @@ a.card:hover { border-color: var(--gold); }
     left: 0;
     right: 0;
     top: 100%;
+    z-index: 20;
     flex-direction: column;
     align-items: flex-start;
-    background: var(--paper);
+    gap: 0.15rem;
+    background: #fff;
     border-bottom: 1px solid var(--line);
-    padding: 0.5rem 1.25rem 1rem;
+    box-shadow: 0 12px 28px rgba(28, 36, 48, 0.12);
+    padding: 0.4rem 0.5rem 0.7rem;
+  }
+  .nav a {
+    color: var(--ink);
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+  }
+  .nav a[aria-current="page"] {
+    color: var(--sea-deep);
+    background: var(--gold-soft);
   }
   .nav.is-open { display: flex; }
 }
