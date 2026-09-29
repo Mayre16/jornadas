@@ -29,27 +29,22 @@ export default function HomePage() {
         <div className="wrap">
           <p className="kicker">La tierra que los recibe</p>
           <h2>Calles, música, piedra y mar</h2>
-          <div className="places">
-            <a className="place place-tall" href="/visitas/">
-              <img src="/img/lugares/colonial.webp" alt="Calle de la Ciudad Colonial con buganvilias y campanario" />
-              <span>Ciudad Colonial</span>
-            </a>
-            <a className="place" href="/visitas/">
-              <img src="/img/lugares/conuco.webp" alt="Bailarines en El Conuco, con la bandera dominicana" />
-              <span>El Conuco</span>
-            </a>
-            <a className="place" href="/visitas/">
-              <img src="/img/lugares/catedral.webp" alt="Fachada de la Catedral Primada de América" />
-              <span>Catedral Primada</span>
-            </a>
-            <a className="place place-cave" href="/visitas/">
-              <img src="/img/lugares/cuevas.webp" alt="Pasarela iluminada en las Cuevas de las Maravillas" />
-              <span>Cuevas de las Maravillas</span>
-            </a>
-            <a className="place place-beach" href="/visitas/">
-              <img src="/img/lugares/boca-chica.webp?v=2" alt="Bahía de Boca Chica desde arriba, con el agua azul celeste" />
-              <span>Boca Chica</span>
-            </a>
+          <div className="places" aria-label="Lugares de Santo Domingo">
+            <span className="place place-plaza">
+              <img src="/img/lugares/collage-malecon.webp" alt="Malecón al anochecer, con el obelisco junto al mar" />
+            </span>
+            <span className="place place-museo">
+              <img src="/img/lugares/collage-parque.webp" alt="Plaza con estatua, árboles y un edificio de piedra" />
+            </span>
+            <span className="place place-catedral">
+              <img src="/img/lugares/collage-alcazar.webp" alt="Palacio de piedra iluminado al atardecer, frente al mar" />
+            </span>
+            <span className="place place-mar">
+              <img src="/img/lugares/collage-playa.webp" alt="Playa de arena y mar azul claro, vista desde arriba" />
+            </span>
+            <span className="place place-espana">
+              <img src="/img/lugares/collage-botanico.webp" alt="Árbol grande y sendero en un jardín" />
+            </span>
           </div>
         </div>
       </section>

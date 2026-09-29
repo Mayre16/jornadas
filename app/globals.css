@@ -154,16 +154,20 @@ img { max-width: 100%; }
 .places-section { padding-top: 2rem; }
 .places {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 1fr;
-  grid-template-rows: 210px 210px;
-  gap: 0.75rem;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  grid-template-rows: 220px 220px;
+  grid-template-areas:
+    "plaza museo catedral"
+    "plaza mar espana";
+  gap: 4px;
+  border-radius: 22px;
+  overflow: hidden;
 }
 .place {
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: 18px;
-  min-height: 180px;
+  min-height: 0;
 }
 .place img {
   width: 100%;
@@ -171,22 +175,14 @@ img { max-width: 100%; }
   object-fit: cover;
   display: block;
 }
-.place-tall { grid-row: span 2; min-height: 100%; }
-.place-cave img { object-position: center 72%; }
-.place-beach img { object-position: center; }
-.place span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2.2rem 1rem 0.9rem;
-  color: #fff;
-  font-family: var(--serif);
-  font-size: 1.35rem;
-  background: linear-gradient(transparent, rgba(8, 30, 26, 0.82));
-}
-.place:hover img { transform: scale(1.04); }
-.place img { transition: transform 0.45s ease; }
+.place-plaza { grid-area: plaza; }
+.place-museo { grid-area: museo; }
+.place-catedral { grid-area: catedral; }
+.place-mar { grid-area: mar; }
+.place-espana { grid-area: espana; }
+.place-plaza img { object-position: 68% center; }
+.place-mar img { object-position: 70% center; }
+.place-catedral img { object-position: center 42%; }
 .hero {
   padding: 0.5rem 0 1.5rem;
   background: transparent;
@@ -691,10 +687,18 @@ a.card:hover { border-color: var(--gold); }
 .reserve-send:disabled { opacity: 0.55; }
 
 @media (max-width: 800px) {
-  .facts, .grid, .shop, .hero-top, .places, .home-cards, .gallery, .columns, .contact-board, .sedes-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .facts, .grid, .shop, .hero-top, .home-cards, .gallery, .columns, .contact-board, .sedes-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .places {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 138px 138px 156px;
+    grid-template-areas:
+      "plaza catedral"
+      "museo espana"
+      "mar mar";
+    gap: 3px;
+  }
   .contact-row { grid-template-columns: 1fr; }
   .tour-card { width: 100%; max-width: 500px; }
-  .place, .place-tall { min-height: 220px; }
   .logo-jornadas { width: 180px; }
   .day, .spot { grid-template-columns: 1fr; }
   .header-inner { position: relative; }
