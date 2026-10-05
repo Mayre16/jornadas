@@ -15,6 +15,7 @@ export type ReservaProduct = {
   note?: string;
   description?: string;
   image: string;
+  stock?: number | null;
 };
 
 type Line = ReservaProduct & { price: number; quantity: number };
@@ -40,6 +41,11 @@ function pesos(label: string): number {
 
 function money(amount: number): string {
   return `RD$ ${amount.toLocaleString("en-US")}`;
+}
+
+function capOf(line: { stock?: number | null }): number {
+  if (line.stock == null) return 99;
+  return Math.max(0, Math.min(99, line.stock));
 }
 
 const PEDIDO_URL = "https://editor.acropolis.adesa.com.do/api/forms/tienda-pedido";
@@ -72,13 +78,17 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
       open,
       setOpen,
       add: (product) => {
+        const cap = capOf(product);
+        if (cap < 1) return;
         setLines((current) => {
           const found = current.find((line) => line.id === product.id);
           if (!found) {
             return [...current, { ...product, price: pesos(product.priceLabel), quantity: 1 }];
           }
           return current.map((line) =>
-            line.id === product.id ? { ...line, quantity: Math.min(99, line.quantity + 1) } : line,
+            line.id === product.id
+              ? { ...line, stock: product.stock, quantity: Math.min(capOf({ ...line, stock: product.stock }), line.quantity + 1) }
+              : line,
           );
         });
         setOpen(true);
@@ -87,7 +97,7 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
         setLines((current) =>
           current
             .map((line) =>
-              line.id === id ? { ...line, quantity: Math.max(0, Math.min(99, quantity)) } : line,
+              line.id === id ? { ...line, quantity: Math.max(0, Math.min(capOf(line), quantity)) } : line,
             )
             .filter((line) => line.quantity > 0),
         );

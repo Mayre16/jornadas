@@ -126,31 +126,25 @@ img { max-width: 100%; }
   box-shadow: 0 16px 40px rgba(15, 36, 32, 0.16);
 }
 .landing-hero {
-  position: relative;
-  min-height: 560px;
   display: flex;
   align-items: center;
   color: #fff8ee;
-  overflow: hidden;
+  background: var(--green);
+  padding: 2.6rem 0 2.8rem;
 }
-.landing-hero-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-}
-.landing-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(8, 40, 32, 0.88) 0%, rgba(8, 40, 32, 0.55) 48%, rgba(8, 40, 32, 0.2) 100%);
-}
-.landing-hero .wrap { position: relative; z-index: 1; width: 100%; }
+.landing-hero .wrap { width: 100%; }
 .landing-hero h1,
 .landing-hero .lede { color: #fff8ee; }
+.landing-hero h1 {
+  font-size: clamp(2.15rem, 3vw, 3.3rem);
+  max-width: 18ch;
+}
 .landing-hero .kicker { color: #f2c14d; }
+.landing-hero .lede {
+  color: #fff8ee;
+  margin: 0;
+  font-size: 1.15rem;
+}
 .places-section { padding-top: 2rem; }
 .places {
   display: grid;
@@ -291,44 +285,39 @@ a.card:hover { border-color: var(--gold); }
 }
 .card p { margin: 0; color: var(--muted); }
 .card p + p { margin-top: 0.55rem; }
-.home-cards {
+.flow a {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.home-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  overflow: hidden;
+  grid-template-columns: 148px 1fr;
+  min-height: 104px;
+  align-items: stretch;
   text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
+  color: var(--ink);
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
 }
-.home-card:hover { border-color: var(--gold); }
-.home-card > img,
-.home-card-pair img {
+.flow a:hover { background: var(--gold-soft); }
+.flow img {
   width: 100%;
-  height: 168px;
+  height: 100%;
+  min-height: 104px;
   object-fit: cover;
   display: block;
 }
-.home-card-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: #fff;
-}
-.home-card-pair img { object-fit: contain; padding: 0.35rem; }
-.home-card div { padding: 1rem 1.15rem 1.2rem; }
-.home-card h3 {
+.flow h2 {
   font-family: var(--serif);
-  font-size: 1.35rem;
-  margin: 0 0 0.35rem;
   font-weight: 560;
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  margin: 0;
+  align-self: center;
+  padding: 0.75rem 1.25rem;
 }
-.home-card p { margin: 0; color: var(--muted); }
+.flow a.flow-plain {
+  grid-template-columns: 1fr;
+  background: var(--green);
+  color: #fff8ee;
+  min-height: 84px;
+}
+.flow a.flow-plain:hover { background: var(--sea-deep); }
 .shop {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -364,6 +353,25 @@ a.card:hover { border-color: var(--gold); }
 .product-desc { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.92rem; }
 .shop-title { margin: 2.4rem 0 0.35rem; }
 .shop-lead { margin: 0 0 1rem; color: var(--muted); max-width: 40rem; }
+.shop-empty { margin: 0 0 1.5rem; color: var(--muted); }
+.shop-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.shop-filters button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  cursor: pointer;
+}
+.shop-filters button[aria-pressed="true"] {
+  background: var(--green);
+  color: #fff8ee;
+  border-color: var(--green);
+}
+.product.is-off { opacity: 0.78; }
+.soldout { margin: 0.7rem 0 0; font-weight: 650; color: var(--muted); }
+.stock-note { margin: 0.2rem 0 0; font-size: 0.88rem; color: var(--sea); }
 .day figure { margin: 0 0 0.85rem; }
 .day figure img, .spot img {
   width: 100%;
@@ -687,7 +695,9 @@ a.card:hover { border-color: var(--gold); }
 .reserve-send:disabled { opacity: 0.55; }
 
 @media (max-width: 800px) {
-  .facts, .grid, .shop, .hero-top, .home-cards, .gallery, .columns, .contact-board, .sedes-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .facts, .grid, .shop, .hero-top, .gallery, .columns, .contact-board, .sedes-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+  .flow a { grid-template-columns: 112px 1fr; min-height: 88px; }
+  .flow img { min-height: 88px; }
   .places {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 138px 138px 156px;
