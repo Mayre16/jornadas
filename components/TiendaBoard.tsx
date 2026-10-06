@@ -80,10 +80,12 @@ export function TiendaBoard() {
                           <img src={catalogImage(item.image)} alt={item.title} />
                           <div>
                             <h3>{item.title}</h3>
-                            <p className="price">
-                              {pesosLabel(item.price)}
-                              {note ? <span className="price-note"> · {note}</span> : null}
-                            </p>
+                            {pesosLabel(item.price) || note ? (
+                              <p className="price">
+                                {pesosLabel(item.price)}
+                                {note ? <span className="price-note">{pesosLabel(item.price) ? ` · ${note}` : note}</span> : null}
+                              </p>
+                            ) : null}
                             {item.stock != null && item.stock > 0 ? (
                               <p className="stock-note">{item.stock} disponibles</p>
                             ) : null}

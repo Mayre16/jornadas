@@ -46,14 +46,14 @@ const SOURCE_CATEGORY: Record<string, CatalogCategory> = {
 const CATEGORY_IDS = new Set<CatalogCategory>(["dominicanos", "acropolis", "libros"]);
 
 export function pesosLabel(price: number): string {
-  if (!Number.isFinite(price) || price <= 0) return "Consultar disponibilidad";
+  if (!Number.isFinite(price) || price <= 0) return "";
   return `RD$ ${price.toLocaleString("en-US")}`;
 }
 
 export function canReserve(item: CatalogItem): boolean {
   if (!item.available) return false;
   if (item.stock === 0) return false;
-  return item.price > 0;
+  return true;
 }
 
 export function catalogImage(src: string): string {
@@ -121,7 +121,7 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
       price,
       priceNote: String(row.priceNote || "").trim(),
       image: String(row.imageUrl || ""),
-      available: price > 0,
+      available: true,
       stock: null,
     });
   }

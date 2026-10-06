@@ -898,7 +898,7 @@
     "price": 0,
     "priceNote": "",
     "image": "/uploads/editorial/1791167392-7da6e6c2.webp",
-    "available": false,
+    "available": true,
     "stock": null
   }
 ]
