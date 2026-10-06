@@ -45,14 +45,7 @@ export function TiendaBoard() {
 
   return (
     <>
-      <section className="hero">
-        <div className="wrap">
-          <p className="kicker">Jornadas 2026</p>
-          <h1>Tienda de las Jornadas</h1>
-          <p className="lede">Souvenirs dominicanos, souvenirs de Nueva Acrópolis y libros. Reserve y le llega a Leslie.</p>
-        </div>
-      </section>
-      <section className="section">
+      <section className="section shop-page">
         <div className="wrap">
           <div className="shop-filters" role="group" aria-label="Categorías">
             <button type="button" aria-pressed={filter === "todas"} onClick={() => setFilter("todas")}>
@@ -107,9 +100,9 @@ export function TiendaBoard() {
                                   stock: orderCap(item),
                                 }}
                               />
-                            ) : (
+                            ) : item.price > 0 ? (
                               <p className="soldout">No disponible</p>
-                            )}
+                            ) : null}
                           </div>
                         </article>
                       );

@@ -18,24 +18,30 @@ export const CATEGORIES: { id: CatalogCategory; title: string; lead: string }[] 
   {
     id: "dominicanos",
     title: "Souvenirs Dominicanos",
-    lead: "Café, cacao, ron y recuerdos de República Dominicana.",
+    lead: "Sabores, tradiciones y recuerdos de República Dominicana.",
   },
   {
     id: "acropolis",
     title: "Souvenirs Nueva Acrópolis",
-    lead: "Polos, piezas en resina, separadores, libretas y camisetas de la editorial.",
+    lead: "Polos, piezas en resina, dijes y recuerdos de Nueva Acrópolis.",
   },
   {
     id: "libros",
     title: "Libros Jornadas",
-    lead: "Libros que Leslie publica para las Jornadas.",
+    lead: "Libros de las Jornadas para llevarse un poco de filosofía a casa.",
   },
 ];
 
 export const FALLBACK_ITEMS = fallback as CatalogItem[];
 
 export const CATALOG_URL =
-  "https://editor.acropolis.adesa.com.do/api/content/jornadas/published";
+  "https://editor.acropolis.adesa.com.do/api/content/editorial/published";
+
+const SOURCE_CATEGORY: Record<string, CatalogCategory> = {
+  "jornadas-2026": "dominicanos",
+  separadores: "acropolis",
+  libretas: "libros",
+};
 
 const CATEGORY_IDS = new Set<CatalogCategory>(["dominicanos", "acropolis", "libros"]);
 
@@ -52,6 +58,7 @@ export function canReserve(item: CatalogItem): boolean {
 
 export function catalogImage(src: string): string {
   if (src.startsWith("/uploads/")) return `https://editor.acropolis.adesa.com.do${src}`;
+  if (src.startsWith("/img/")) return `https://tienda.acropolis.org.do${src}`;
   return src;
 }
 
@@ -74,7 +81,56 @@ function isItem(value: unknown): value is CatalogItem {
   );
 }
 
+function blocked(id: string, title: string): boolean {
+  const blob = `${id} ${title}`.toLowerCase();
+  if (blob.includes("memorion") || blob.includes("memorión")) return true;
+  if (title.toLowerCase().startsWith("libreta")) return true;
+  const low = title.toLowerCase();
+  if (low.includes("camiseta") && /s[oó]crates|plat[oó]n|metaphysica/.test(low)) return true;
+  return false;
+}
+
+function fromEditorial(data: unknown): CatalogItem[] | null {
+  const regalos = (data as { sections?: { editorialRegalos?: unknown } })?.sections?.editorialRegalos;
+  if (!Array.isArray(regalos)) return null;
+  const items: CatalogItem[] = [];
+  for (const raw of regalos) {
+    if (!raw || typeof raw !== "object") continue;
+    const row = raw as {
+      id?: string;
+      title?: string;
+      category?: string;
+      sample?: boolean;
+      price?: number | null;
+      priceNote?: string;
+      description?: string;
+      imageUrl?: string;
+    };
+    if (row.sample === true) continue;
+    const title = String(row.title || "").trim();
+    const id = String(row.id || "").trim();
+    if (!id || !title || blocked(id, title)) continue;
+    const category = SOURCE_CATEGORY[String(row.category || "")];
+    if (!category) continue;
+    const price = typeof row.price === "number" && Number.isFinite(row.price) ? row.price : 0;
+    items.push({
+      id,
+      category,
+      title,
+      description: String(row.description || "").trim(),
+      price,
+      priceNote: String(row.priceNote || "").trim(),
+      image: String(row.imageUrl || ""),
+      available: price > 0,
+      stock: null,
+    });
+  }
+  return items.length ? items : null;
+}
+
 export function readCatalog(data: unknown): CatalogItem[] | null {
+  const editorial = fromEditorial(data);
+  if (editorial) return editorial;
   const root = data as { sections?: { jornadasTienda?: { items?: unknown } }; items?: unknown };
   const raw = Array.isArray(data)
     ? data
