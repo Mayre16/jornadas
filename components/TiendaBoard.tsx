@@ -62,7 +62,7 @@ export function TiendaBoard() {
               </button>
             ))}
           </div>
-          {visible.map((category) => {
+          {visible.map((category, categoryIndex) => {
             const group = items.filter((item) => item.category === category.id);
             return (
               <div key={category.id}>
@@ -72,12 +72,19 @@ export function TiendaBoard() {
                   <p className="shop-empty">Todavía no hay artículos en esta categoría.</p>
                 ) : (
                   <div className="shop">
-                    {group.map((item) => {
+                    {group.map((item, index) => {
                       const open = canReserve(item);
                       const note = extraNote(item);
+                      const first = categoryIndex === 0 && index < 3;
                       return (
                         <article key={item.id} className={open ? "product" : "product is-off"}>
-                          <img src={catalogImage(item.image)} alt={item.title} />
+                          <img
+                            src={catalogImage(item.image)}
+                            alt={item.title}
+                            loading={first ? "eager" : "lazy"}
+                            decoding="async"
+                            fetchPriority={first ? "high" : "low"}
+                          />
                           <div>
                             <h3>{item.title}</h3>
                             {pesosLabel(item.price) || note ? (
