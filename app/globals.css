@@ -364,6 +364,32 @@ a.card:hover { border-color: var(--gold); }
 .shop-filters + div > .shop-title { margin-top: 0.85rem; }
 .shop-lead { margin: 0 0 1rem; color: var(--muted); max-width: 40rem; }
 .shop-empty { margin: 0 0 1.5rem; color: var(--muted); }
+.shop-search {
+  display: flex;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+}
+.shop-search input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+}
+.shop-search button {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff8ee;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
 .shop-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .shop-filters button {
   border: 1px solid var(--line);

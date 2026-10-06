@@ -18,6 +18,10 @@ import {
   type CatalogItem,
 } from "@/lib/catalog";
 
+function fold(value: string): string {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
 function extraNote(item: CatalogItem): string {
   const note = (item.priceNote || "").trim();
   const price = pesosLabel(item.price);
@@ -29,6 +33,8 @@ function extraNote(item: CatalogItem): string {
 export function TiendaBoard() {
   const [items, setItems] = useState<CatalogItem[]>(FALLBACK_ITEMS);
   const [filter, setFilter] = useState<CatalogCategory | "todas">("todas");
+  const [draft, setDraft] = useState("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     let cancel = false;
@@ -50,12 +56,39 @@ export function TiendaBoard() {
     };
   }, []);
 
-  const visible = CATEGORIES.filter((category) => filter === "todas" || filter === category.id);
+  const needle = fold(query.trim());
+  const visible = CATEGORIES.filter((category) => filter === "todas" || filter === category.id)
+    .map((category) => ({
+      ...category,
+      group: items.filter((item) => {
+        if (item.category !== category.id) return false;
+        if (!needle) return true;
+        return fold(`${item.title} ${item.description || ""}`).includes(needle);
+      }),
+    }))
+    .filter((category) => !needle || category.group.length > 0);
 
   return (
     <>
       <section className="section shop-page">
         <div className="wrap">
+          <form
+            className="shop-search"
+            role="search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setQuery(draft);
+            }}
+          >
+            <input
+              type="search"
+              value={draft}
+              placeholder="Buscar un artículo"
+              aria-label="Buscar un artículo"
+              onChange={(event) => setDraft(event.target.value)}
+            />
+            <button type="submit">Buscar</button>
+          </form>
           <div className="shop-filters" role="group" aria-label="Categorías">
             <button type="button" aria-pressed={filter === "todas"} onClick={() => setFilter("todas")}>
               Todas
@@ -71,8 +104,11 @@ export function TiendaBoard() {
               </button>
             ))}
           </div>
+          {visible.length === 0 ? (
+            <p className="shop-empty">No hay artículos con ese nombre.</p>
+          ) : null}
           {visible.map((category, categoryIndex) => {
-            const group = items.filter((item) => item.category === category.id);
+            const group = category.group;
             return (
               <div key={category.id}>
                 <h2 className="shop-title">{category.title}</h2>
