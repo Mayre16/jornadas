@@ -43,6 +43,13 @@ const SOURCE_CATEGORY: Record<string, CatalogCategory> = {
   libretas: "libros",
 };
 
+const BLURBS: Record<string, string> = {
+  "libreta-conocete":
+    "Obra del Dr. Miguel F. Torres. Recorre el incienso en las civilizaciones antiguas: su botánica y su química, el comercio por la ruta del incienso y su uso en la vida religiosa, y cierra con el incienso en Guatemala.",
+  "libreta-escribir":
+    "Textos de Epicteto, Séneca y Marco Aurelio, con apuntes de la vida de cada uno y un esquema de las tres etapas del estoicismo. Una lectura para acercarse a una filosofía práctica.",
+};
+
 const CATEGORY_IDS = new Set<CatalogCategory>(["dominicanos", "acropolis", "libros"]);
 
 export function pesosLabel(price: number): string {
@@ -113,11 +120,12 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
     const category = SOURCE_CATEGORY[String(row.category || "")];
     if (!category) continue;
     const price = typeof row.price === "number" && Number.isFinite(row.price) ? row.price : 0;
+    const description = String(row.description || "").trim() || BLURBS[id] || "";
     items.push({
       id,
       category,
       title,
-      description: String(row.description || "").trim(),
+      description,
       price,
       priceNote: String(row.priceNote || "").trim(),
       image: String(row.imageUrl || ""),
