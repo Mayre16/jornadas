@@ -72,37 +72,39 @@ export function TiendaBoard() {
     <>
       <section className="section shop-page">
         <div className="wrap">
-          <form
-            className="shop-search"
-            role="search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setQuery(draft);
-            }}
-          >
-            <input
-              type="search"
-              value={draft}
-              placeholder="Buscar un artículo"
-              aria-label="Buscar un artículo"
-              onChange={(event) => setDraft(event.target.value)}
-            />
-            <button type="submit">Buscar</button>
-          </form>
-          <div className="shop-filters" role="group" aria-label="Categorías">
-            <button type="button" aria-pressed={filter === "todas"} onClick={() => setFilter("todas")}>
-              Todas
-            </button>
-            {CATEGORIES.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                aria-pressed={filter === category.id}
-                onClick={() => setFilter(category.id)}
-              >
-                {category.title}
+          <div className="shop-toolbar">
+            <form
+              className="shop-search"
+              role="search"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setQuery(draft);
+              }}
+            >
+              <input
+                type="search"
+                value={draft}
+                placeholder="Buscar"
+                aria-label="Buscar un artículo"
+                onChange={(event) => setDraft(event.target.value)}
+              />
+              <button type="submit">Buscar</button>
+            </form>
+            <div className="shop-filters" role="group" aria-label="Categorías">
+              <button type="button" aria-pressed={filter === "todas"} onClick={() => setFilter("todas")}>
+                Todas
               </button>
-            ))}
+              {CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  aria-pressed={filter === category.id}
+                  onClick={() => setFilter(category.id)}
+                >
+                  {category.title}
+                </button>
+              ))}
+            </div>
           </div>
           {visible.length === 0 ? (
             <p className="shop-empty">No hay artículos con ese nombre.</p>
