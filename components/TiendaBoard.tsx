@@ -81,13 +81,32 @@ export function TiendaBoard() {
                 setQuery(draft);
               }}
             >
-              <input
-                type="search"
-                value={draft}
-                placeholder="Buscar"
-                aria-label="Buscar un artículo"
-                onChange={(event) => setDraft(event.target.value)}
-              />
+              <div className="shop-search-field">
+                <input
+                  type="search"
+                  value={draft}
+                  placeholder="Buscar"
+                  aria-label="Buscar un artículo"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setDraft(value);
+                    if (!value.trim()) setQuery("");
+                  }}
+                />
+                {draft || query ? (
+                  <button
+                    type="button"
+                    className="shop-search-clear"
+                    aria-label="Quitar la búsqueda"
+                    onClick={() => {
+                      setDraft("");
+                      setQuery("");
+                    }}
+                  >
+                    ×
+                  </button>
+                ) : null}
+              </div>
               <button type="submit">Buscar</button>
             </form>
             <div className="shop-filters" role="group" aria-label="Categorías">
