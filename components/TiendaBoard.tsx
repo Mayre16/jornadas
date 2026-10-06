@@ -11,6 +11,7 @@ import {
   availabilityLabel,
   canReserve,
   catalogImage,
+  dolaresLabel,
   orderCap,
   pesosLabel,
   readCatalog,
@@ -23,11 +24,15 @@ function fold(value: string): string {
 }
 
 function extraNote(item: CatalogItem): string {
-  const note = (item.priceNote || "").trim();
-  const price = pesosLabel(item.price);
-  if (!note || note === price) return "";
-  if (note.startsWith(price)) return note.slice(price.length).replace(/^[\s·]+/, "");
-  return note;
+  const usd = dolaresLabel(item.price);
+  const rest = (item.priceNote || "")
+    .trim()
+    .replace(/^(?:RD\$\s*[\d,.]+\s*[·|-]\s*)?(?:USD|US)\s*\$\s*\d[\d.,]*/i, "")
+    .replace(/^[\s·|-]+/, "")
+    .trim();
+  if (!rest) return usd;
+  if (/US\$|USD\$/i.test(rest)) return rest.startsWith("(") && usd ? `${usd} ${rest}` : rest;
+  return usd ? `${usd} · ${rest}` : rest;
 }
 
 export function TiendaBoard() {

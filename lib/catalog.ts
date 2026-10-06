@@ -55,9 +55,18 @@ const BLURBS: Record<string, string> = {
 
 const CATEGORY_IDS = new Set<CatalogCategory>(["dominicanos", "acropolis", "libros"]);
 
+const USD_RATE = 61;
+
 export function pesosLabel(price: number): string {
   if (!Number.isFinite(price) || price <= 0) return "";
   return `RD$ ${price.toLocaleString("en-US")}`;
+}
+
+export function dolaresLabel(price: number): string {
+  if (!Number.isFinite(price) || price <= 0) return "";
+  const cents = Math.round((price / USD_RATE) * 100) / 100;
+  const text = Number.isInteger(cents) ? String(cents) : cents.toFixed(2);
+  return `USD$${text}`;
 }
 
 export function canReserve(item: CatalogItem): boolean {
