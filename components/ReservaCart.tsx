@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { trackReserva } from "@/components/JornadasAnalytics";
 
 export type ReservaProduct = {
   id: string;
@@ -207,6 +208,7 @@ function ReservaDrawer() {
         setError(data.error || "No se pudo enviar la reserva.");
         return;
       }
+      trackReserva();
       setSuccess("Reserva enviada. Llega al correo de Leslie y una copia al suyo.");
       setNote("");
       lines.forEach((line) => remove(line.id));
