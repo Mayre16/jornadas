@@ -37,6 +37,9 @@ export const FALLBACK_ITEMS = fallback as CatalogItem[];
 export const CATALOG_URL =
   "https://editor.acropolis.adesa.com.do/api/content/editorial/published";
 
+export const AJUSTES_URL =
+  "https://editor.acropolis.adesa.com.do/api/content/jornadas/published";
+
 const SOURCE_CATEGORY: Record<string, CatalogCategory> = {
   "jornadas-2026": "dominicanos",
   separadores: "acropolis",
@@ -134,6 +137,64 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
     });
   }
   return items.length ? items : null;
+}
+
+export function availabilityLabel(item: CatalogItem): string {
+  if (item.stock === 0) return "Agotado";
+  if (!item.available) return "No disponible";
+  return "";
+}
+
+export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[] {
+  const section = (
+    data as {
+      sections?: {
+        jornadasTienda?: {
+          kind?: string;
+          ajustes?: unknown;
+          agregados?: unknown;
+        };
+      };
+    }
+  )?.sections?.jornadasTienda;
+  if (!section || section.kind !== "ajustes") return items;
+  const next = items.map((item) => ({ ...item }));
+  const byId = new Map(next.map((item) => [item.id, item]));
+  if (Array.isArray(section.ajustes)) {
+    for (const raw of section.ajustes) {
+      if (!raw || typeof raw !== "object") continue;
+      const row = raw as {
+        id?: string;
+        price?: number;
+        priceNote?: string;
+        stock?: number | null;
+        status?: string;
+      };
+      const item = row.id ? byId.get(String(row.id)) : undefined;
+      if (!item) continue;
+      if (typeof row.price === "number" && Number.isFinite(row.price)) item.price = Math.max(0, row.price);
+      if (typeof row.priceNote === "string") item.priceNote = row.priceNote.trim();
+      const status = String(row.status || "");
+      if (status === "agotado") {
+        item.available = true;
+        item.stock = 0;
+      } else if (status === "no_disponible") {
+        item.available = false;
+      } else if (status === "disponible") {
+        item.available = true;
+        const stock = row.stock;
+        item.stock = stock == null ? null : Math.max(0, Number(stock) || 0);
+      }
+    }
+  }
+  if (Array.isArray(section.agregados)) {
+    for (const raw of section.agregados) {
+      if (!isItem(raw) || byId.has(raw.id)) continue;
+      next.push(raw);
+      byId.set(raw.id, raw);
+    }
+  }
+  return next;
 }
 
 export function readCatalog(data: unknown): CatalogItem[] | null {

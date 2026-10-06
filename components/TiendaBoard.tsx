@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { ReservaButton, ReservaToggle } from "@/components/ReservaCart";
 import {
+  AJUSTES_URL,
   CATALOG_URL,
   CATEGORIES,
   FALLBACK_ITEMS,
+  applyAjustes,
+  availabilityLabel,
   canReserve,
   catalogImage,
   orderCap,
@@ -29,11 +32,17 @@ export function TiendaBoard() {
 
   useEffect(() => {
     let cancel = false;
-    fetch(CATALOG_URL)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        const next = readCatalog(data);
-        if (!cancel && next) setItems(next);
+    Promise.all([
+      fetch(CATALOG_URL)
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+      fetch(AJUSTES_URL)
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+    ])
+      .then(([catalog, ajustes]) => {
+        const next = readCatalog(catalog);
+        if (!cancel && next) setItems(applyAjustes(next, ajustes));
       })
       .catch(() => undefined);
     return () => {
@@ -109,9 +118,9 @@ export function TiendaBoard() {
                                   stock: orderCap(item),
                                 }}
                               />
-                            ) : item.price > 0 ? (
-                              <p className="soldout">No disponible</p>
-                            ) : null}
+                            ) : (
+                              <p className="soldout">{availabilityLabel(item)}</p>
+                            )}
                           </div>
                         </article>
                       );
