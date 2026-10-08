@@ -204,7 +204,6 @@ function ReservaDrawer() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
-  const [website, setWebsite] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -241,7 +240,7 @@ function ReservaDrawer() {
           email: email.trim(),
           phone: phone.trim(),
           note: note.trim(),
-          website,
+          website: "",
           siteUrl: "https://jornadas.acropolis.org.do",
           items: lines.map((line) => ({
             kind: "regalo",
@@ -332,10 +331,6 @@ function ReservaDrawer() {
           <label>
             Nota
             <textarea value={note} onChange={(event) => setNote(event.target.value)} rows={2} />
-          </label>
-          <label className="reserve-hp">
-            Sitio web
-            <input value={website} onChange={(event) => setWebsite(event.target.value)} tabIndex={-1} autoComplete="off" />
           </label>
           <p className="reserve-total">
             <span>Total</span>
