@@ -23,6 +23,32 @@ function fold(value: string): string {
   return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
+type Variant = {
+  name: string;
+  priceUsd: number;
+  priceDop: number;
+};
+
+const USD_RATE = 61;
+
+function parseVariants(priceNote: string): Variant[] | null {
+  if (!priceNote.toLowerCase().startsWith("precios:")) return null;
+  const parts = priceNote.replace(/^precios:\s*/i, "").split(/\s*[·•]\s*/);
+  const variants: Variant[] = [];
+  for (const part of parts) {
+    const match = part.match(/^(.+?)\s*[—–-]\s*US\$?\s*(\d+)/i);
+    if (match) {
+      const priceUsd = parseInt(match[2], 10);
+      variants.push({
+        name: match[1].trim(),
+        priceUsd,
+        priceDop: priceUsd * USD_RATE,
+      });
+    }
+  }
+  return variants.length > 1 ? variants : null;
+}
+
 function extraNote(item: CatalogItem): string {
   const usd = dolaresLabel(item.price);
   const rest = (item.priceNote || "")
@@ -33,6 +59,79 @@ function extraNote(item: CatalogItem): string {
   if (!rest) return usd;
   if (/US\$|USD\$/i.test(rest)) return rest.startsWith("(") && usd ? `${usd} ${rest}` : rest;
   return usd ? `${usd} · ${rest}` : rest;
+}
+
+function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
+  const variants = parseVariants(item.priceNote || "");
+  const [selectedVariant, setSelectedVariant] = useState(0);
+  const open = canReserve(item);
+
+  const currentVariant = variants ? variants[selectedVariant] : null;
+  const displayPrice = currentVariant ? currentVariant.priceDop : item.price;
+  const displayNote = currentVariant 
+    ? `USD$${currentVariant.priceUsd}` 
+    : extraNote(item);
+
+  return (
+    <article className={open ? "product" : "product is-off"}>
+      <img
+        src={catalogImage(item.image)}
+        alt={item.title}
+        loading={first ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={first ? "high" : "low"}
+      />
+      <div>
+        <h3>{item.title}</h3>
+        {displayPrice > 0 || displayNote ? (
+          <p className="price">
+            {displayPrice > 0 ? pesosLabel(displayPrice) : ""}
+            {displayNote ? (
+              <span className="price-note">
+                {displayPrice > 0 ? ` · ${displayNote}` : displayNote}
+              </span>
+            ) : null}
+          </p>
+        ) : null}
+        {item.stock != null && item.stock > 0 ? (
+          <p className="stock-note">{item.stock} disponibles</p>
+        ) : null}
+        {item.description ? <p className="product-desc">{item.description}</p> : null}
+        
+        {variants ? (
+          <div className="variant-selector">
+            <select
+              value={selectedVariant}
+              onChange={(e) => setSelectedVariant(Number(e.target.value))}
+              className="variant-select"
+            >
+              {variants.map((v, i) => (
+                <option key={i} value={i}>
+                  {v.name} — US${v.priceUsd}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+        
+        {open ? (
+          <ReservaButton
+            product={{
+              id: currentVariant ? `${item.id}-${selectedVariant}` : item.id,
+              title: currentVariant ? `${item.title} (${currentVariant.name})` : item.title,
+              priceLabel: pesosLabel(displayPrice),
+              note: displayNote,
+              description: item.description,
+              image: catalogImage(item.image),
+              stock: orderCap(item),
+            }}
+          />
+        ) : (
+          <p className="soldout">{availabilityLabel(item)}</p>
+        )}
+      </div>
+    </article>
+  );
 }
 
 export function TiendaBoard() {
@@ -143,50 +242,13 @@ export function TiendaBoard() {
                   <p className="shop-empty">Todavía no hay artículos en esta categoría.</p>
                 ) : (
                   <div className="shop">
-                    {group.map((item, index) => {
-                      const open = canReserve(item);
-                      const note = extraNote(item);
-                      const first = categoryIndex === 0 && index < 3;
-                      return (
-                        <article key={item.id} className={open ? "product" : "product is-off"}>
-                          <img
-                            src={catalogImage(item.image)}
-                            alt={item.title}
-                            loading={first ? "eager" : "lazy"}
-                            decoding="async"
-                            fetchPriority={first ? "high" : "low"}
-                          />
-                          <div>
-                            <h3>{item.title}</h3>
-                            {pesosLabel(item.price) || note ? (
-                              <p className="price">
-                                {pesosLabel(item.price)}
-                                {note ? <span className="price-note">{pesosLabel(item.price) ? ` · ${note}` : note}</span> : null}
-                              </p>
-                            ) : null}
-                            {item.stock != null && item.stock > 0 ? (
-                              <p className="stock-note">{item.stock} disponibles</p>
-                            ) : null}
-                            {item.description ? <p className="product-desc">{item.description}</p> : null}
-                            {open ? (
-                              <ReservaButton
-                                product={{
-                                  id: item.id,
-                                  title: item.title,
-                                  priceLabel: pesosLabel(item.price),
-                                  note,
-                                  description: item.description,
-                                  image: catalogImage(item.image),
-                                  stock: orderCap(item),
-                                }}
-                              />
-                            ) : (
-                              <p className="soldout">{availabilityLabel(item)}</p>
-                            )}
-                          </div>
-                        </article>
-                      );
-                    })}
+                    {group.map((item, index) => (
+                      <ProductCard
+                        key={item.id}
+                        item={item}
+                        first={categoryIndex === 0 && index < 3}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
