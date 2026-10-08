@@ -12,6 +12,19 @@ export type CatalogItem = {
   image: string;
   available: boolean;
   stock: number | null;
+  optionStock?: Record<string, number>;
+};
+
+export const POLO_COLOR: Record<string, string> = {
+  "sep-nervo": "Azul marino",
+  "sep-suntzu-conocete": "Negro",
+  "sep-suntzu-resultados": "Naranja",
+};
+
+export const POLO_SIZES: Record<string, Record<string, number>> = {
+  "sep-nervo": { S: 2, M: 3, L: 2 },
+  "sep-suntzu-conocete": { S: 1, M: 2, L: 1 },
+  "sep-suntzu-resultados": { M: 1, L: 1 },
 };
 
 export const CATEGORIES: { id: CatalogCategory; title: string; lead: string }[] = [
@@ -142,6 +155,7 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
       image: String(row.imageUrl || ""),
       available: true,
       stock: null,
+      optionStock: POLO_SIZES[id] ? { ...POLO_SIZES[id] } : undefined,
     });
   }
   return items.length ? items : null;
@@ -177,15 +191,26 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
         priceNote?: string;
         stock?: number | null;
         status?: string;
+        opciones?: unknown;
       };
       const item = row.id ? byId.get(String(row.id)) : undefined;
       if (!item) continue;
       if (typeof row.price === "number" && Number.isFinite(row.price)) item.price = Math.max(0, row.price);
       if (typeof row.priceNote === "string") item.priceNote = row.priceNote.trim();
+      if (row.opciones && typeof row.opciones === "object") {
+        const nextStock = { ...(item.optionStock || {}) };
+        for (const [name, qty] of Object.entries(row.opciones as Record<string, unknown>)) {
+          if (typeof qty === "number" && Number.isFinite(qty)) nextStock[name] = Math.max(0, qty);
+        }
+        if (Object.keys(nextStock).length) item.optionStock = nextStock;
+      }
       const status = String(row.status || "");
       if (status === "agotado") {
         item.available = true;
         item.stock = 0;
+        if (item.optionStock) {
+          item.optionStock = Object.fromEntries(Object.keys(item.optionStock).map((name) => [name, 0]));
+        }
       } else if (status === "no_disponible") {
         item.available = false;
       } else if (status === "disponible") {

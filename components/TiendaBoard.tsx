@@ -13,6 +13,7 @@ import {
   catalogImage,
   dolaresLabel,
   orderCap,
+  POLO_COLOR,
   readCatalog,
   type CatalogCategory,
   type CatalogItem,
@@ -26,6 +27,7 @@ type Variant = {
   name: string;
   priceUsd: number;
   priceDop: number;
+  stock: number | null;
 };
 
 const USD_RATE = 61;
@@ -42,22 +44,75 @@ function parseVariants(priceNote: string): Variant[] | null {
         name: match[1].trim(),
         priceUsd,
         priceDop: priceUsd * USD_RATE,
+        stock: null,
       });
     }
   }
   return variants.length > 1 ? variants : null;
 }
 
-function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
-  const variants = parseVariants(item.priceNote || "");
-  const [selectedVariant, setSelectedVariant] = useState(0);
-  const open = canReserve(item);
+function optionQty(item: CatalogItem, name: string): number | null {
+  const stock = item.optionStock;
+  if (!stock) return null;
+  if (Object.prototype.hasOwnProperty.call(stock, name)) return stock[name];
+  const want = fold(name);
+  for (const [key, qty] of Object.entries(stock)) {
+    if (fold(key) === want) return qty;
+  }
+  return null;
+}
 
-  const currentVariant = variants ? variants[selectedVariant] : null;
-  const displayPrice = currentVariant ? currentVariant.priceDop : item.price;
-  const priceUsd = currentVariant 
-    ? `US$${currentVariant.priceUsd}` 
-    : dolaresLabel(displayPrice);
+function choicesFor(item: CatalogItem): Variant[] | null {
+  const priced = parseVariants(item.priceNote || "");
+  if (priced) {
+    return priced.map((variant) => ({ ...variant, stock: optionQty(item, variant.name) }));
+  }
+  if (!item.optionStock || !POLO_COLOR[item.id]) return null;
+  const order = ["S", "M", "L", "XL"];
+  const names = Object.keys(item.optionStock).sort((a, b) => {
+    const left = order.indexOf(a);
+    const right = order.indexOf(b);
+    if (left === -1 && right === -1) return a.localeCompare(b, "es");
+    if (left === -1) return 1;
+    if (right === -1) return -1;
+    return left - right;
+  });
+  const usd = Math.ceil(item.price / USD_RATE);
+  return names.map((name) => ({
+    name,
+    priceUsd: usd,
+    priceDop: item.price,
+    stock: item.optionStock?.[name] ?? null,
+  }));
+}
+
+function choiceLabel(choice: Variant, sized: boolean): string {
+  const base = sized ? `Talla ${choice.name}` : `${choice.name} — US$${choice.priceUsd}`;
+  if (choice.stock === 0) return `${base} — agotado`;
+  if (choice.stock != null) return `${base} — ${choice.stock} disponibles`;
+  return base;
+}
+
+function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
+  const choices = choicesFor(item);
+  const sized = Boolean(choices && POLO_COLOR[item.id]);
+  const [selectedVariant, setSelectedVariant] = useState(0);
+
+  useEffect(() => {
+    const list = choicesFor(item);
+    if (!list) return;
+    const openAt = list.findIndex((choice) => choice.stock == null || choice.stock > 0);
+    setSelectedVariant(openAt < 0 ? 0 : openAt);
+  }, [item]);
+
+  const current = choices ? choices[Math.min(selectedVariant, choices.length - 1)] : null;
+  const selectedStock = current ? current.stock : item.stock;
+  const open = choices
+    ? item.available && (selectedStock == null || selectedStock > 0)
+    : canReserve(item);
+  const displayPrice = current ? current.priceDop : item.price;
+  const priceUsd = current && !sized ? `US$${current.priceUsd}` : dolaresLabel(displayPrice);
+  const reserveStock = selectedStock == null ? orderCap(item) : Math.max(0, Math.min(99, selectedStock));
 
   return (
     <article className={open ? "product" : "product is-off"}>
@@ -70,43 +125,48 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
       />
       <div>
         <h3>{item.title}</h3>
+        {POLO_COLOR[item.id] ? <p className="product-desc">{POLO_COLOR[item.id]}</p> : null}
         {priceUsd ? (
           <p className="price">{priceUsd}</p>
         ) : null}
-        {item.stock != null && item.stock > 0 ? (
+        {!choices && item.stock != null && item.stock > 0 ? (
           <p className="stock-note">{item.stock} disponibles</p>
         ) : null}
         {item.description ? <p className="product-desc">{item.description}</p> : null}
         
-        {variants ? (
+        {choices && current ? (
           <div className="variant-selector">
-            <select
-              value={selectedVariant}
-              onChange={(e) => setSelectedVariant(Number(e.target.value))}
-              className="variant-select"
-            >
-              {variants.map((v, i) => (
-                <option key={i} value={i}>
-                  {v.name} — US${v.priceUsd}
-                </option>
-              ))}
-            </select>
+            <label>
+              {sized ? "Talla" : "Modelo"}
+              <select
+                value={String(Math.min(selectedVariant, choices.length - 1))}
+                onChange={(e) => setSelectedVariant(Number(e.target.value))}
+                className="variant-select"
+                aria-label={sized ? "Talla" : "Modelo"}
+              >
+                {choices.map((choice, index) => (
+                  <option key={choice.name} value={index} disabled={choice.stock === 0}>
+                    {choiceLabel(choice, sized)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         ) : null}
         
         {open ? (
           <ReservaButton
             product={{
-              id: currentVariant ? `${item.id}-${selectedVariant}` : item.id,
-              title: currentVariant ? `${item.title} (${currentVariant.name})` : item.title,
+              id: current ? `${item.id}-${current.name}` : item.id,
+              title: current ? `${item.title} (${current.name})` : item.title,
               priceLabel: priceUsd,
               description: item.description,
               image: catalogImage(item.image),
-              stock: orderCap(item),
+              stock: reserveStock,
             }}
           />
         ) : (
-          <p className="soldout">{availabilityLabel(item)}</p>
+          <p className="soldout">{availabilityLabel(item) || "Agotado"}</p>
         )}
       </div>
     </article>

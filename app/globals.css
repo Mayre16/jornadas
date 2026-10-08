@@ -700,6 +700,17 @@ a.card:hover { border-color: var(--gold); }
 .variant-selector {
   margin-top: 0.5rem;
 }
+.variant-selector label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.stock-note {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
 .variant-select {
   width: 100%;
   font: inherit;
