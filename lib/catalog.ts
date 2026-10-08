@@ -64,9 +64,8 @@ export function pesosLabel(price: number): string {
 
 export function dolaresLabel(price: number): string {
   if (!Number.isFinite(price) || price <= 0) return "";
-  const cents = Math.round((price / USD_RATE) * 100) / 100;
-  const text = Number.isInteger(cents) ? String(cents) : cents.toFixed(2);
-  return `USD$${text}`;
+  const usd = Math.round(price / USD_RATE);
+  return `US$${usd}`;
 }
 
 export function canReserve(item: CatalogItem): boolean {
