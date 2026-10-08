@@ -169,26 +169,45 @@ export function TiendaBoard() {
   const [filter, setFilter] = useState<CatalogCategory | "todas">("todas");
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncNote, setSyncNote] = useState("");
 
-  useEffect(() => {
-    let cancel = false;
-    Promise.all([
+  async function reloadCatalog() {
+    const [catalog, ajustes] = await Promise.all([
       fetch(CATALOG_URL)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
       fetch(AJUSTES_URL)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
-    ])
-      .then(([catalog, ajustes]) => {
-        const next = readCatalog(catalog);
-        if (!cancel && next) setItems(applyAjustes(next, ajustes));
-      })
-      .catch(() => undefined);
-    return () => {
-      cancel = true;
-    };
+    ]);
+    const next = readCatalog(catalog);
+    if (next) setItems(applyAjustes(next, ajustes));
+  }
+
+  useEffect(() => {
+    reloadCatalog().catch(() => undefined);
   }, []);
+
+  async function syncStock() {
+    setSyncing(true);
+    setSyncNote("");
+    try {
+      const res = await fetch("https://editor.acropolis.adesa.com.do/api/content/jornadas/sync-stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string; mensaje?: string };
+      if (!res.ok) throw new Error(data.error || "No se pudo sincronizar");
+      await reloadCatalog();
+      setSyncNote(data.mensaje || "Stock actualizado.");
+    } catch (error) {
+      setSyncNote(error instanceof Error ? error.message : "No se pudo sincronizar.");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   const needle = fold(query.trim());
   const visible = CATEGORIES.filter((category) => filter === "todas" || filter === category.id)
@@ -243,6 +262,15 @@ export function TiendaBoard() {
               </div>
               <button type="submit">Buscar</button>
             </form>
+            <button type="button" className="sync-stock" onClick={() => void syncStock()} disabled={syncing}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.7 2.7L3 8" />
+                <path d="M3 3v5h5" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.7-2.7L21 16" />
+                <path d="M16 16h5v5" />
+              </svg>
+              {syncing ? "Sincronizando…" : "Sincronizar"}
+            </button>
             <div className="shop-filters" role="group" aria-label="Categorías">
               <button type="button" aria-pressed={filter === "todas"} onClick={() => setFilter("todas")}>
                 Todas
@@ -259,6 +287,7 @@ export function TiendaBoard() {
               ))}
             </div>
           </div>
+          {syncNote ? <p className="sync-note">{syncNote}</p> : null}
           {visible.length === 0 ? (
             <p className="shop-empty">No hay artículos con ese nombre.</p>
           ) : null}

@@ -371,6 +371,25 @@ a.card:hover { border-color: var(--gold); }
   gap: 0.75rem;
   margin: 0 0 0.85rem;
 }
+.sync-stock {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff8ee;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 650;
+  padding: 0.38rem 0.8rem;
+  cursor: pointer;
+  flex: none;
+}
+.sync-stock svg { width: 16px; height: 16px; }
+.sync-stock:disabled { opacity: 0.65; cursor: wait; }
+.sync-note { margin: -0.35rem 0 0.85rem; color: var(--muted); font-size: 0.9rem; }
 .shop-search {
   display: flex;
   flex: 0 1 16rem;
@@ -959,6 +978,7 @@ a.card:hover { border-color: var(--gold); }
     align-items: stretch;
     gap: 0.55rem;
   }
+  .sync-stock { margin-left: 0; align-self: flex-end; }
   .shop-search { flex: none; width: 100%; }
   .shop-search input {
     font-size: 1rem;
