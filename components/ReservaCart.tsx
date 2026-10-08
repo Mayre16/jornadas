@@ -276,15 +276,9 @@ function ReservaDrawer() {
     <>
       <button className="reserve-backdrop" type="button" aria-label="Cerrar reserva" onClick={() => setOpen(false)} />
       <aside className="reserve-drawer" aria-label="Reserva de la tienda">
-        <header>
-          <h2>Reserva</h2>
-          <button type="button" onClick={() => setOpen(false)}>
-            Cerrar
-          </button>
-        </header>
         <div className="reserve-body">
           {lines.length === 0 && !success ? (
-            <p>Aún no hay artículos. Use «Añadir a la reserva» en la tienda.</p>
+            <p>Aún no hay artículos. Use «Añadir» en la tienda.</p>
           ) : null}
           {success ? <p className="reserve-ok">{success}</p> : null}
           <ul>
@@ -348,10 +342,14 @@ function ReservaDrawer() {
             <strong>{moneyUsd(total)}</strong>
           </p>
           {error ? <p className="reserve-error">{error}</p> : null}
-          <button className="reserve-send" type="submit" disabled={busy || lines.length === 0}>
-            {busy ? "Enviando…" : "Enviar reserva"}
-          </button>
-          <p className="reserve-hint">Se envía al correo de Leslie y una copia al correo que usted indica.</p>
+          <div className="reserve-actions">
+            <button className="reserve-send" type="submit" disabled={busy || lines.length === 0}>
+              {busy ? "Enviando…" : "Enviar"}
+            </button>
+            <button className="reserve-close" type="button" onClick={() => setOpen(false)}>
+              Cerrar
+            </button>
+          </div>
         </form>
       </aside>
     </>

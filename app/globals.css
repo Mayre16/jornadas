@@ -796,15 +796,7 @@ a.card:hover { border-color: var(--gold); }
   display: flex;
   flex-direction: column;
 }
-.reserve-drawer header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.6rem 0.9rem;
-  border-bottom: 1px solid var(--line);
-}
-.reserve-drawer header h2 { margin: 0; font-size: 1.1rem; }
-.reserve-drawer header button, .qty button {
+.qty button {
   font: inherit;
   font-size: 0.85rem;
   border: 1px solid var(--line);
@@ -834,9 +826,27 @@ a.card:hover { border-color: var(--gold); }
 .reserve-error, .reserve-ok { margin: 0; border-radius: 10px; padding: 0.55rem 0.7rem; font-size: 0.92rem; }
 .reserve-error { background: #fde8e8; color: #8a2430; }
 .reserve-ok { background: #e7f6ef; color: #0d3b32; }
-.reserve-hint { margin: 0; color: var(--muted); font-size: 0.82rem; }
-.reserve-send { width: 100%; }
+.reserve-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+.reserve-send {
+  flex: 1;
+  padding: 0.5rem 1rem;
+}
 .reserve-send:disabled { opacity: 0.55; }
+.reserve-close {
+  flex: none;
+  font: inherit;
+  font-size: 0.85rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+}
 
 .toast-container {
   position: fixed;
