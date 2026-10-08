@@ -64,7 +64,7 @@ export function pesosLabel(price: number): string {
 
 export function dolaresLabel(price: number): string {
   if (!Number.isFinite(price) || price <= 0) return "";
-  const usd = Math.round(price / USD_RATE);
+  const usd = Math.ceil(price / USD_RATE);
   return `US$${usd}`;
 }
 
