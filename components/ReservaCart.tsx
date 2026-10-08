@@ -43,14 +43,14 @@ type CartApi = {
 const CartContext = createContext<CartApi | null>(null);
 const STORAGE = "jornadas-reserva-v1";
 
-function pesos(label: string): number {
+function parsePrice(label: string): number {
   const digits = label.replace(/[^\d]/g, "");
   const value = Number(digits);
   return Number.isFinite(value) ? value : 0;
 }
 
-function money(amount: number): string {
-  return `RD$ ${amount.toLocaleString("en-US")}`;
+function moneyUsd(amount: number): string {
+  return `US$${amount}`;
 }
 
 function capOf(line: { stock?: number | null }): number {
@@ -105,7 +105,7 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
         setLines((current) => {
           const found = current.find((line) => line.id === product.id);
           if (!found) {
-            return [...current, { ...product, price: pesos(product.priceLabel), quantity: 1 }];
+            return [...current, { ...product, price: parsePrice(product.priceLabel), quantity: 1 }];
           }
           newQuantity = Math.min(capOf({ ...found, stock: product.stock }), found.quantity + 1);
           return current.map((line) =>
@@ -293,10 +293,7 @@ function ReservaDrawer() {
                 <img src={line.image} alt="" />
                 <div>
                   <strong>{line.title}</strong>
-                  <span>
-                    {line.priceLabel}
-                    {line.note ? ` · ${line.note}` : ""}
-                  </span>
+                  <span>{line.priceLabel}</span>
                   <div className="qty">
                     <button type="button" onClick={() => setQty(line.id, line.quantity - 1)} aria-label="Quitar uno">
                       −
@@ -348,7 +345,7 @@ function ReservaDrawer() {
           </label>
           <p className="reserve-total">
             <span>Total</span>
-            <strong>{money(total)}</strong>
+            <strong>{moneyUsd(total)}</strong>
           </p>
           {error ? <p className="reserve-error">{error}</p> : null}
           <button className="reserve-send" type="submit" disabled={busy || lines.length === 0}>

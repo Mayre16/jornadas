@@ -13,7 +13,6 @@ import {
   catalogImage,
   dolaresLabel,
   orderCap,
-  pesosLabel,
   readCatalog,
   type CatalogCategory,
   type CatalogItem,
@@ -49,18 +48,6 @@ function parseVariants(priceNote: string): Variant[] | null {
   return variants.length > 1 ? variants : null;
 }
 
-function extraNote(item: CatalogItem): string {
-  const usd = dolaresLabel(item.price);
-  const rest = (item.priceNote || "")
-    .trim()
-    .replace(/^(?:RD\$\s*[\d,.]+\s*[·|-]\s*)?(?:USD|US)\s*\$\s*\d[\d.,]*/i, "")
-    .replace(/^[\s·|-]+/, "")
-    .trim();
-  if (!rest) return usd;
-  if (/US\$|USD\$/i.test(rest)) return rest.startsWith("(") && usd ? `${usd} ${rest}` : rest;
-  return usd ? `${usd} · ${rest}` : rest;
-}
-
 function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
   const variants = parseVariants(item.priceNote || "");
   const [selectedVariant, setSelectedVariant] = useState(0);
@@ -68,9 +55,9 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
 
   const currentVariant = variants ? variants[selectedVariant] : null;
   const displayPrice = currentVariant ? currentVariant.priceDop : item.price;
-  const displayNote = currentVariant 
-    ? `USD$${currentVariant.priceUsd}` 
-    : extraNote(item);
+  const priceUsd = currentVariant 
+    ? `US$${currentVariant.priceUsd}` 
+    : dolaresLabel(displayPrice);
 
   return (
     <article className={open ? "product" : "product is-off"}>
@@ -83,15 +70,8 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
       />
       <div>
         <h3>{item.title}</h3>
-        {displayPrice > 0 || displayNote ? (
-          <p className="price">
-            {displayPrice > 0 ? pesosLabel(displayPrice) : ""}
-            {displayNote ? (
-              <span className="price-note">
-                {displayPrice > 0 ? ` · ${displayNote}` : displayNote}
-              </span>
-            ) : null}
-          </p>
+        {priceUsd ? (
+          <p className="price">{priceUsd}</p>
         ) : null}
         {item.stock != null && item.stock > 0 ? (
           <p className="stock-note">{item.stock} disponibles</p>
@@ -119,8 +99,7 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
             product={{
               id: currentVariant ? `${item.id}-${selectedVariant}` : item.id,
               title: currentVariant ? `${item.title} (${currentVariant.name})` : item.title,
-              priceLabel: pesosLabel(displayPrice),
-              note: displayNote,
+              priceLabel: priceUsd,
               description: item.description,
               image: catalogImage(item.image),
               stock: orderCap(item),
