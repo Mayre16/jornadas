@@ -679,41 +679,59 @@ a.card:hover { border-color: var(--gold); }
   cursor: pointer;
 }
 .reserve-btn, .reserve-send {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   border: 0;
   border-radius: 999px;
   background: var(--green);
   color: #fff8ee;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.88rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.82rem;
   font-weight: 650;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 .reserve-btn-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .reserve-btn-text {
   display: inline;
 }
+.variant-selector {
+  margin-top: 0.5rem;
+}
+.variant-select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+.variant-select:focus {
+  outline: 2px solid var(--sea);
+  outline-offset: 1px;
+}
 .product-qty {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0.05rem;
   background: var(--gold-soft);
   border-radius: 999px;
-  padding: 0.2rem;
+  padding: 0.15rem;
 }
 .product-qty-btn {
-  width: 2rem;
-  height: 2rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border: 0;
   border-radius: 50%;
   background: var(--green);
   color: #fff8ee;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -726,10 +744,10 @@ a.card:hover { border-color: var(--gold); }
   cursor: not-allowed;
 }
 .product-qty-count {
-  min-width: 2rem;
+  min-width: 1.5rem;
   text-align: center;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--green);
 }
 .reserve-float {
@@ -782,26 +800,27 @@ a.card:hover { border-color: var(--gold); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.1rem;
+  padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--line);
 }
-.reserve-drawer header h2 { margin: 0; font-size: 1.4rem; }
+.reserve-drawer header h2 { margin: 0; font-size: 1.1rem; }
 .reserve-drawer header button, .qty button {
   font: inherit;
+  font-size: 0.85rem;
   border: 1px solid var(--line);
   background: #fff;
   border-radius: 999px;
-  padding: 0.25rem 0.7rem;
+  padding: 0.2rem 0.55rem;
   cursor: pointer;
 }
-.reserve-body { overflow: auto; padding: 1rem 1.1rem; flex: 1; }
-.reserve-body ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
-.reserve-body li { display: grid; grid-template-columns: 64px 1fr; gap: 0.7rem; }
-.reserve-body img { width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 10px; }
-.reserve-body strong { display: block; }
-.reserve-body li span { color: var(--muted); font-size: 0.88rem; }
-.qty { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.35rem; }
-.reserve-form { border-top: 1px solid var(--line); padding: 0.9rem 1.1rem 1.2rem; display: grid; gap: 0.55rem; }
+.reserve-body { overflow: auto; padding: 0.7rem 0.9rem; flex: 1; }
+.reserve-body ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.reserve-body li { display: grid; grid-template-columns: 50px 1fr; gap: 0.5rem; }
+.reserve-body img { width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 8px; }
+.reserve-body strong { display: block; font-size: 0.9rem; }
+.reserve-body li span { color: var(--muted); font-size: 0.8rem; }
+.qty { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.25rem; }
+.reserve-form { border-top: 1px solid var(--line); padding: 0.7rem 0.9rem 1rem; display: grid; gap: 0.45rem; }
 .reserve-form label { display: grid; gap: 0.2rem; font-size: 0.88rem; font-weight: 650; }
 .reserve-form input, .reserve-form textarea {
   font: inherit;
