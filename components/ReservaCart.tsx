@@ -36,6 +36,7 @@ type CartApi = {
   add: (product: ReservaProduct) => void;
   setQty: (id: string, quantity: number) => void;
   remove: (id: string) => void;
+  getQty: (id: string) => number;
   toasts: ToastItem[];
 };
 
@@ -125,6 +126,7 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
         );
       },
       remove: (id) => setLines((current) => current.filter((line) => line.id !== id)),
+      getQty: (id) => lines.find((line) => line.id === id)?.quantity ?? 0,
     }),
     [lines, open, toasts, showToast],
   );
@@ -145,10 +147,39 @@ export function useReserva(): CartApi {
 }
 
 export function ReservaButton({ product }: { product: ReservaProduct }) {
-  const { add } = useReserva();
+  const { add, getQty, setQty } = useReserva();
+  const qty = getQty(product.id);
+  const cap = capOf(product);
+
+  if (qty > 0) {
+    return (
+      <div className="product-qty">
+        <button
+          type="button"
+          className="product-qty-btn"
+          onClick={() => setQty(product.id, qty - 1)}
+          aria-label="Quitar uno"
+        >
+          −
+        </button>
+        <span className="product-qty-count">{qty}</span>
+        <button
+          type="button"
+          className="product-qty-btn"
+          onClick={() => add(product)}
+          disabled={qty >= cap}
+          aria-label="Añadir uno más"
+        >
+          +
+        </button>
+      </div>
+    );
+  }
+
   return (
     <button className="reserve-btn" type="button" onClick={() => add(product)}>
-      Añadir a la reserva
+      <span className="reserve-btn-icon">🛒</span>
+      <span className="reserve-btn-text">Añadir</span>
     </button>
   );
 }
