@@ -250,7 +250,7 @@ function ReservaDrawer() {
             description: line.description ?? "",
             quantity: line.quantity,
             price: line.price,
-            currency: "DOP",
+            currency: "USD",
             imageUrl: line.image,
           })),
         }),
