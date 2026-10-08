@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -21,6 +22,12 @@ export type ReservaProduct = {
 
 type Line = ReservaProduct & { price: number; quantity: number };
 
+type ToastItem = {
+  id: number;
+  title: string;
+  count: number;
+};
+
 type CartApi = {
   lines: Line[];
   count: number;
@@ -29,6 +36,7 @@ type CartApi = {
   add: (product: ReservaProduct) => void;
   setQty: (id: string, quantity: number) => void;
   remove: (id: string) => void;
+  toasts: ToastItem[];
 };
 
 const CartContext = createContext<CartApi | null>(null);
@@ -55,6 +63,16 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<Line[]>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const toastIdRef = { current: 0 };
+
+  const showToast = useCallback((title: string, count: number) => {
+    const id = ++toastIdRef.current;
+    setToasts((prev) => [...prev, { id, title, count }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 2500);
+  }, []);
 
   useEffect(() => {
     try {
@@ -78,21 +96,24 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
       count: lines.reduce((sum, line) => sum + line.quantity, 0),
       open,
       setOpen,
+      toasts,
       add: (product) => {
         const cap = capOf(product);
         if (cap < 1) return;
+        let newQuantity = 1;
         setLines((current) => {
           const found = current.find((line) => line.id === product.id);
           if (!found) {
             return [...current, { ...product, price: pesos(product.priceLabel), quantity: 1 }];
           }
+          newQuantity = Math.min(capOf({ ...found, stock: product.stock }), found.quantity + 1);
           return current.map((line) =>
             line.id === product.id
-              ? { ...line, stock: product.stock, quantity: Math.min(capOf({ ...line, stock: product.stock }), line.quantity + 1) }
+              ? { ...line, stock: product.stock, quantity: newQuantity }
               : line,
           );
         });
-        setOpen(true);
+        showToast(product.title, newQuantity);
       },
       setQty: (id, quantity) => {
         setLines((current) =>
@@ -105,13 +126,14 @@ export function ReservaProvider({ children }: { children: React.ReactNode }) {
       },
       remove: (id) => setLines((current) => current.filter((line) => line.id !== id)),
     }),
-    [lines, open],
+    [lines, open, toasts, showToast],
   );
 
   return (
     <CartContext.Provider value={api}>
       {children}
       <ReservaDrawer />
+      <ToastContainer toasts={toasts} />
     </CartContext.Provider>
   );
 }
@@ -305,5 +327,23 @@ function ReservaDrawer() {
         </form>
       </aside>
     </>
+  );
+}
+
+function ToastContainer({ toasts }: { toasts: ToastItem[] }) {
+  if (toasts.length === 0) return null;
+
+  return (
+    <div className="toast-container">
+      {toasts.map((toast) => (
+        <div key={toast.id} className="toast">
+          <span className="toast-check">✓</span>
+          <span className="toast-text">
+            <strong>{toast.title}</strong> añadido
+            {toast.count > 1 ? ` (${toast.count})` : ""}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }

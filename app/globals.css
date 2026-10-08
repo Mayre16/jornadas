@@ -775,6 +775,58 @@ a.card:hover { border-color: var(--gold); }
 .reserve-send { width: 100%; }
 .reserve-send:disabled { opacity: 0.55; }
 
+.toast-container {
+  position: fixed;
+  top: 5rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--green);
+  color: #fff8ee;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(13, 59, 50, 0.25);
+  animation: toast-slide 0.3s ease-out, toast-fade 0.3s ease-in 2.2s forwards;
+  max-width: 280px;
+}
+.toast-check {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: var(--gold);
+  color: var(--green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.toast-text {
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+.toast-text strong {
+  display: block;
+  font-weight: 650;
+}
+@keyframes toast-slide {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 @media (max-width: 800px) {
   .facts, .grid, .shop, .hero-top, .gallery, .columns, .contact-board, .sedes-grid { grid-template-columns: 1fr; grid-template-rows: none; }
   .wrap { padding: 0 0.9rem; }
