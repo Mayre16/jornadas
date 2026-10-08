@@ -86,36 +86,18 @@ function choicesFor(item: CatalogItem): Variant[] | null {
   }));
 }
 
-function choiceLabel(choice: Variant, sized: boolean): string {
-  const base = sized ? `Talla ${choice.name}` : `${choice.name} — US$${choice.priceUsd}`;
-  if (choice.stock === 0) return `${base} — agotado`;
-  if (choice.stock != null) return `${base} — ${choice.stock} disponibles`;
-  return base;
+function stockText(stock: number | null): string {
+  return stock == null ? "stock: —" : `stock: ${stock}`;
 }
 
 function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
   const choices = choicesFor(item);
   const sized = Boolean(choices && POLO_COLOR[item.id]);
-  const [selectedVariant, setSelectedVariant] = useState(0);
-
-  useEffect(() => {
-    const list = choicesFor(item);
-    if (!list) return;
-    const openAt = list.findIndex((choice) => choice.stock == null || choice.stock > 0);
-    setSelectedVariant(openAt < 0 ? 0 : openAt);
-  }, [item]);
-
-  const current = choices ? choices[Math.min(selectedVariant, choices.length - 1)] : null;
-  const selectedStock = current ? current.stock : item.stock;
-  const open = choices
-    ? item.available && (selectedStock == null || selectedStock > 0)
-    : canReserve(item);
-  const displayPrice = current ? current.priceDop : item.price;
-  const priceUsd = current && !sized ? `US$${current.priceUsd}` : dolaresLabel(displayPrice);
-  const reserveStock = selectedStock == null ? orderCap(item) : Math.max(0, Math.min(99, selectedStock));
+  const priceUsd = dolaresLabel(item.price);
+  const open = canReserve(item);
 
   return (
-    <article className={open ? "product" : "product is-off"}>
+    <article className={open || choices ? "product" : "product is-off"}>
       <img
         src={catalogImage(item.image)}
         alt={item.title}
@@ -126,47 +108,56 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
       <div>
         <h3>{item.title}</h3>
         {POLO_COLOR[item.id] ? <p className="product-desc">{POLO_COLOR[item.id]}</p> : null}
-        {priceUsd ? (
-          <p className="price">{priceUsd}</p>
-        ) : null}
-        {!choices && item.stock != null && item.stock > 0 ? (
-          <p className="stock-note">{item.stock} disponibles</p>
-        ) : null}
+        {!choices && priceUsd ? <p className="price">{priceUsd}</p> : null}
         {item.description ? <p className="product-desc">{item.description}</p> : null}
-        
-        {choices && current ? (
-          <div className="variant-selector">
-            <label>
-              {sized ? "Talla" : "Modelo"}
-              <select
-                value={String(Math.min(selectedVariant, choices.length - 1))}
-                onChange={(e) => setSelectedVariant(Number(e.target.value))}
-                className="variant-select"
-                aria-label={sized ? "Talla" : "Modelo"}
-              >
-                {choices.map((choice, index) => (
-                  <option key={choice.name} value={index} disabled={choice.stock === 0}>
-                    {choiceLabel(choice, sized)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        ) : null}
-        
-        {open ? (
-          <ReservaButton
-            product={{
-              id: current ? `${item.id}-${current.name}` : item.id,
-              title: current ? `${item.title} (${current.name})` : item.title,
-              priceLabel: priceUsd,
-              description: item.description,
-              image: catalogImage(item.image),
-              stock: reserveStock,
-            }}
-          />
+
+        {choices ? (
+          <ul className="option-list">
+            {choices.map((choice) => {
+              const canAdd = item.available && (choice.stock == null || choice.stock > 0);
+              const name = sized ? `Talla ${choice.name}` : choice.name;
+              const reserveStock = choice.stock == null ? orderCap(item) : Math.max(0, Math.min(99, choice.stock));
+              return (
+                <li key={choice.name} className="option-row">
+                  <p className="option-line">
+                    {name} — US${choice.priceUsd} — {stockText(choice.stock)}
+                  </p>
+                  {canAdd ? (
+                    <ReservaButton
+                      product={{
+                        id: `${item.id}-${choice.name}`,
+                        title: `${item.title} (${choice.name})`,
+                        priceLabel: `US$${choice.priceUsd}`,
+                        description: item.description,
+                        image: catalogImage(item.image),
+                        stock: reserveStock,
+                      }}
+                    />
+                  ) : (
+                    <p className="soldout">Agotado</p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         ) : (
-          <p className="soldout">{availabilityLabel(item) || "Agotado"}</p>
+          <div className="product-buy">
+            <span className="stock-pill">{stockText(item.stock)}</span>
+            {open ? (
+              <ReservaButton
+                product={{
+                  id: item.id,
+                  title: item.title,
+                  priceLabel: priceUsd,
+                  description: item.description,
+                  image: catalogImage(item.image),
+                  stock: orderCap(item),
+                }}
+              />
+            ) : (
+              <p className="soldout">{availabilityLabel(item) || "Agotado"}</p>
+            )}
+          </div>
         )}
       </div>
     </article>

@@ -711,6 +711,44 @@ a.card:hover { border-color: var(--gold); }
   color: var(--muted);
   font-size: 0.85rem;
 }
+.product-buy,
+.option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+.product .product-buy { margin-top: 0.7rem; padding: 0; }
+.option-row .soldout { margin: 0; white-space: nowrap; }
+.product-buy .reserve-btn,
+.option-row .reserve-btn {
+  margin-top: 0;
+  margin-left: auto;
+  flex: none;
+}
+.stock-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--sea);
+  white-space: nowrap;
+}
+.option-list {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.option-line {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
 .variant-select {
   width: 100%;
   font: inherit;
