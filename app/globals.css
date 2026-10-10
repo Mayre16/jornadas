@@ -389,6 +389,19 @@ a.card:hover { border-color: var(--gold); }
 }
 .sync-stock svg { width: 16px; height: 16px; }
 .sync-stock:disabled { opacity: 0.65; cursor: wait; }
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--muted);
+  color: #fff;
+  transition: background 0.15s;
+}
+.admin-link:hover { background: var(--ink); }
+.admin-link svg { width: 16px; height: 16px; }
 .sync-note { margin: -0.35rem 0 0.85rem; color: var(--muted); font-size: 0.9rem; }
 .shop-search {
   display: flex;
