@@ -121,6 +121,20 @@ function blocked(id: string, title: string): boolean {
   return false;
 }
 
+function parseOptionStock(raw: unknown): Record<string, number> | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const result: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      result[key.trim()] = Math.max(0, value);
+    } else if (typeof value === "string") {
+      const num = parseInt(value, 10);
+      if (Number.isFinite(num)) result[key.trim()] = Math.max(0, num);
+    }
+  }
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
 function fromEditorial(data: unknown): CatalogItem[] | null {
   const regalos = (data as { sections?: { editorialRegalos?: unknown } })?.sections?.editorialRegalos;
   if (!Array.isArray(regalos)) return null;
@@ -136,6 +150,10 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
       priceNote?: string;
       description?: string;
       imageUrl?: string;
+      stock?: number | null;
+      opciones?: unknown;
+      optionStock?: unknown;
+      variantes?: unknown;
     };
     if (row.sample === true) continue;
     const title = String(row.title || "").trim();
@@ -145,6 +163,10 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
     if (!category) continue;
     const price = typeof row.price === "number" && Number.isFinite(row.price) ? row.price : 0;
     const description = String(row.description || "").trim() || BLURBS[id] || "";
+    const stockFromEditor = parseOptionStock(row.opciones) 
+      || parseOptionStock(row.optionStock) 
+      || parseOptionStock(row.variantes);
+    const stock = typeof row.stock === "number" ? Math.max(0, row.stock) : null;
     items.push({
       id,
       category,
@@ -154,8 +176,8 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
       priceNote: String(row.priceNote || "").trim(),
       image: String(row.imageUrl || ""),
       available: true,
-      stock: null,
-      optionStock: POLO_SIZES[id] ? { ...POLO_SIZES[id] } : undefined,
+      stock,
+      optionStock: stockFromEditor || (POLO_SIZES[id] ? { ...POLO_SIZES[id] } : undefined),
     });
   }
   return items.length ? items : null;
