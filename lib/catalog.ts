@@ -118,6 +118,7 @@ function blocked(id: string, title: string): boolean {
   if (title.toLowerCase().startsWith("libreta")) return true;
   const low = title.toLowerCase();
   if (low.includes("camiseta") && /s[oó]crates|plat[oó]n|metaphysica/.test(low)) return true;
+  if (id === "regalo-mv39datl") return true;
   return false;
 }
 
@@ -138,7 +139,9 @@ function fromEditorial(data: unknown): CatalogItem[] | null {
       imageUrl?: string;
     };
     if (row.sample === true) continue;
-    const title = String(row.title || "").trim();
+    const title = row.id === "regalo-mu21s5gv"
+      ? "Lapicero | \"Por un Mundo Nuevo y Mejor\""
+      : String(row.title || "").trim();
     const id = String(row.id || "").trim();
     if (!id || !title || blocked(id, title)) continue;
     const category = SOURCE_CATEGORY[String(row.category || "")];
@@ -198,11 +201,14 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
       if (typeof row.price === "number" && Number.isFinite(row.price)) item.price = Math.max(0, row.price);
       if (typeof row.priceNote === "string") item.priceNote = row.priceNote.trim();
       if (row.opciones && typeof row.opciones === "object") {
-        const nextStock = { ...(item.optionStock || {}) };
+        const nextStock: Record<string, number> = {};
         for (const [name, qty] of Object.entries(row.opciones as Record<string, unknown>)) {
           if (typeof qty === "number" && Number.isFinite(qty)) nextStock[name] = Math.max(0, qty);
         }
         if (Object.keys(nextStock).length) item.optionStock = nextStock;
+        else delete item.optionStock;
+      } else {
+        delete item.optionStock;
       }
       const status = String(row.status || "");
       if (status === "agotado") {
@@ -222,9 +228,18 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
   }
   if (Array.isArray(section.agregados)) {
     for (const raw of section.agregados) {
-      if (!isItem(raw) || byId.has(raw.id)) continue;
-      next.push(raw);
-      byId.set(raw.id, raw);
+      if (!raw || typeof raw !== "object") continue;
+      const item = raw as CatalogItem & { opciones?: unknown };
+      if (!isItem(item) || byId.has(item.id)) continue;
+      if (item.opciones && typeof item.opciones === "object") {
+        const optionStock: Record<string, number> = {};
+        for (const [name, qty] of Object.entries(item.opciones as Record<string, unknown>)) {
+          if (typeof qty === "number" && Number.isFinite(qty)) optionStock[name] = Math.max(0, qty);
+        }
+        if (Object.keys(optionStock).length) item.optionStock = optionStock;
+      }
+      next.push(item);
+      byId.set(item.id, item);
     }
   }
   return next;

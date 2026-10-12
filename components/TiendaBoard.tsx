@@ -92,7 +92,10 @@ function stockText(stock: number | null): string {
 
 function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
   const choices = choicesFor(item);
-  const sized = Boolean(choices && POLO_COLOR[item.id]);
+  const sized = Boolean(
+    choices &&
+      (POLO_COLOR[item.id] || choices.every((choice) => /^(S|M|L|XL)$/.test(choice.name))),
+  );
   const priceUsd = dolaresLabel(item.price);
   const open = canReserve(item);
 
