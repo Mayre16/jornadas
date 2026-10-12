@@ -74,6 +74,47 @@ const KNOWN_OPTIONS: Record<string, { name: string; qty: number; usd: number }[]
   ],
 };
 
+const NEW_PRODUCTS: CatalogItem[] = [
+  {
+    id: "nuevo-cafe-tejamani",
+    category: "dominicanos",
+    title: "Café Tejamani Orgánico",
+    price: 610,
+    priceNote: "USD$10",
+    image: "",
+    available: true,
+    stock: 10,
+  },
+  {
+    id: "nuevo-iman-pilon",
+    category: "dominicanos",
+    title: "Imán República Dominicana | Pilón",
+    price: 183,
+    priceNote: "USD$3",
+    image: "",
+    available: true,
+    stock: 10,
+  },
+  {
+    id: "nuevo-lapicero-virtudes",
+    category: "acropolis",
+    title: "Lapicero | Las virtudes del discípulo",
+    price: 610,
+    priceNote: "USD$10",
+    image: "",
+    available: true,
+    stock: 50,
+  },
+];
+
+function withNewProducts(items: CatalogItem[]): CatalogItem[] {
+  const ids = new Set(items.map((item) => item.id));
+  for (const extra of NEW_PRODUCTS) {
+    if (!ids.has(extra.id)) items.push({ ...extra });
+  }
+  return items;
+}
+
 function applyKnownOptions(item: CatalogItem, saved: unknown) {
   const known = KNOWN_OPTIONS[item.id];
   if (!known) return;
@@ -250,7 +291,7 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
       };
     }
   )?.sections?.jornadasTienda;
-  if (!section || section.kind !== "ajustes") return items;
+  if (!section || section.kind !== "ajustes") return withNewProducts(items.map((item) => ({ ...item })));
   const next = items.map((item) => ({ ...item }));
   const byId = new Map(next.map((item) => [item.id, item]));
   if (Array.isArray(section.ajustes)) {
@@ -309,7 +350,7 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
       byId.set(item.id, item);
     }
   }
-  return next;
+  return withNewProducts(next);
 }
 
 export function readCatalog(data: unknown): CatalogItem[] | null {

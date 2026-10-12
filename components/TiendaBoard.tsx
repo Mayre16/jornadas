@@ -101,13 +101,17 @@ function ProductCard({ item, first }: { item: CatalogItem; first: boolean }) {
 
   return (
     <article className={open || choices ? "product" : "product is-off"}>
-      <img
-        src={catalogImage(item.image)}
-        alt={item.title}
-        loading={first ? "eager" : "lazy"}
-        decoding="async"
-        fetchPriority={first ? "high" : "low"}
-      />
+      {item.image ? (
+        <img
+          src={catalogImage(item.image)}
+          alt={item.title}
+          loading={first ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={first ? "high" : "low"}
+        />
+      ) : (
+        <p className="product-nophoto">Sin foto</p>
+      )}
       <div>
         <h3>{item.title}</h3>
         {POLO_COLOR[item.id] ? <p className="product-desc">{POLO_COLOR[item.id]}</p> : null}
