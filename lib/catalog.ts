@@ -95,16 +95,6 @@ const NEW_PRODUCTS: CatalogItem[] = [
     available: true,
     stock: 10,
   },
-  {
-    id: "nuevo-lapicero-virtudes",
-    category: "acropolis",
-    title: "Lapicero | Las virtudes del discípulo",
-    price: 610,
-    priceNote: "USD$10",
-    image: "",
-    available: true,
-    stock: 50,
-  },
 ];
 
 function withNewProducts(items: CatalogItem[]): CatalogItem[] {
