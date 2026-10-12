@@ -19,7 +19,75 @@ export const POLO_COLOR: Record<string, string> = {
   "sep-nervo": "Azul marino",
   "sep-suntzu-conocete": "Negro",
   "sep-suntzu-resultados": "Naranja",
+  "item-mv3buww9": "Blanco",
 };
+
+const KNOWN_OPTIONS: Record<string, { name: string; qty: number; usd: number }[]> = {
+  "sep-nervo": [
+    { name: "S", qty: 2, usd: 30 },
+    { name: "M", qty: 3, usd: 30 },
+    { name: "L", qty: 2, usd: 30 },
+  ],
+  "sep-suntzu-conocete": [
+    { name: "S", qty: 1, usd: 30 },
+    { name: "M", qty: 2, usd: 30 },
+    { name: "L", qty: 1, usd: 30 },
+  ],
+  "sep-suntzu-resultados": [
+    { name: "M", qty: 1, usd: 30 },
+    { name: "L", qty: 1, usd: 30 },
+  ],
+  "item-mv3buww9": [
+    { name: "S", qty: 2, usd: 30 },
+    { name: "M", qty: 3, usd: 30 },
+    { name: "L", qty: 2, usd: 30 },
+  ],
+  "regalo-muudl8on": [
+    { name: "Amarillo", qty: 1, usd: 35 },
+    { name: "Verde", qty: 1, usd: 35 },
+  ],
+  "regalo-muudlazo": [
+    { name: "Azul L", qty: 1, usd: 35 },
+    { name: "Azul M", qty: 1, usd: 35 },
+    { name: "Beige M", qty: 1, usd: 35 },
+    { name: "Negro M", qty: 3, usd: 35 },
+  ],
+  "regalo-mu20izhp": [
+    { name: "Hipatia de Alejandría", qty: 1, usd: 15 },
+    { name: "Marco Aurelio", qty: 1, usd: 15 },
+    { name: "Olimpia", qty: 2, usd: 15 },
+    { name: "Platón", qty: 1, usd: 15 },
+  ],
+  "regalo-mu21s5gv": [
+    { name: "Plástico", qty: 50, usd: 1 },
+    { name: "Metálico", qty: 60, usd: 3 },
+  ],
+  "regalo-mu0awa5f": [
+    { name: "Amarillo", qty: 3, usd: 12 },
+    { name: "Azul béisbol", qty: 3, usd: 12 },
+    { name: "Azul RD", qty: 3, usd: 12 },
+    { name: "Negro", qty: 3, usd: 12 },
+  ],
+  "regalo-mu0awcd6": [
+    { name: "Azul", qty: 1, usd: 15 },
+    { name: "Blanco", qty: 1, usd: 15 },
+  ],
+};
+
+function applyKnownOptions(item: CatalogItem, saved: unknown) {
+  const known = KNOWN_OPTIONS[item.id];
+  if (!known) return;
+  const fromSaved: Record<string, number> = {};
+  if (saved && typeof saved === "object") {
+    for (const [name, qty] of Object.entries(saved as Record<string, unknown>)) {
+      if (typeof qty === "number" && Number.isFinite(qty)) fromSaved[name] = Math.max(0, qty);
+    }
+  }
+  item.optionStock = Object.keys(fromSaved).length
+    ? fromSaved
+    : Object.fromEntries(known.map((option) => [option.name, option.qty]));
+  item.priceNote = `Precios: ${known.map((option) => `${option.name} — US$${option.usd}`).join(" · ")}`;
+}
 
 export const POLO_SIZES: Record<string, Record<string, number>> = {
   "sep-nervo": { S: 2, M: 3, L: 2 },
@@ -200,15 +268,13 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
       if (!item) continue;
       if (typeof row.price === "number" && Number.isFinite(row.price)) item.price = Math.max(0, row.price);
       if (typeof row.priceNote === "string") item.priceNote = row.priceNote.trim();
-      if (row.opciones && typeof row.opciones === "object") {
+      if (KNOWN_OPTIONS[item.id]) applyKnownOptions(item, row.opciones);
+      else if (row.opciones && typeof row.opciones === "object") {
         const nextStock: Record<string, number> = {};
         for (const [name, qty] of Object.entries(row.opciones as Record<string, unknown>)) {
           if (typeof qty === "number" && Number.isFinite(qty)) nextStock[name] = Math.max(0, qty);
         }
         if (Object.keys(nextStock).length) item.optionStock = nextStock;
-        else delete item.optionStock;
-      } else {
-        delete item.optionStock;
       }
       const status = String(row.status || "");
       if (status === "agotado") {
@@ -238,6 +304,7 @@ export function applyAjustes(items: CatalogItem[], data: unknown): CatalogItem[]
         }
         if (Object.keys(optionStock).length) item.optionStock = optionStock;
       }
+      applyKnownOptions(item, item.opciones);
       next.push(item);
       byId.set(item.id, item);
     }
